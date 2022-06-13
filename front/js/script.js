@@ -1,3 +1,4 @@
+// getting all product articles to show up on homepage
 function loadProducts() {
     //get data and check validity response
     fetch("http://localhost:3000/api/products")
@@ -10,7 +11,6 @@ function loadProducts() {
         //console.log('products :', products);
         const itemsSection = document.getElementById('items')
         //console.log('product 2 :', products[1].name + ' ' + products[1].price + '€');
-        
         for (let product of products) {
             //console.log('product :', product);
             //console.log('product name :', product.name);
@@ -22,7 +22,7 @@ function loadProducts() {
             const showParagraph = document.createElement('p');
             showAnchor.setAttribute('href', './product.html?id=' + product._id);
             showImage.setAttribute('src', product.imageUrl);
-            showImageAlt.innerHTML = product.altText; //? or setAttribute?
+            showImage.alt = product.altTxt;
             showHeading.innerHTML = product.name;
             showHeading.classList.add('productName');
             showParagraph.innerHTML = product.description;
