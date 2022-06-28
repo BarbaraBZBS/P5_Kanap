@@ -16,19 +16,17 @@ function loadProducts() {
             //console.log('product name :', product.name);
             const showAnchor = document.createElement('a');
             const showArticle = document.createElement('article');
-            const showImage = document.createElement('img');
-            const showImageAlt = document.createElement('alt');
+            const showImage = document.createElement('img'); 
             const showHeading = document.createElement('h3');
             const showParagraph = document.createElement('p');
             showAnchor.setAttribute('href', './product.html?id=' + product._id);
             showImage.setAttribute('src', product.imageUrl);
             showImage.alt = product.altTxt;
-            showHeading.innerHTML = product.name;
+            showHeading.innerText = product.name;
             showHeading.classList.add('productName');
-            showParagraph.innerHTML = product.description;
+            showParagraph.innerText = product.description;
             showParagraph.classList.add('productDescription');
             showArticle.appendChild(showImage);
-            showImage.append(showImageAlt);
             showArticle.appendChild(showHeading);
             showArticle.appendChild(showParagraph);
             showAnchor.appendChild(showArticle);
@@ -36,19 +34,8 @@ function loadProducts() {
         }
     })
     .catch(function(err) {
-        //an error occurred
+        console.log('error :', err);
+        alert("Erreur");
     })
 }
 loadProducts();
-
-
-
-
-
-
-
-
-
-
-
-

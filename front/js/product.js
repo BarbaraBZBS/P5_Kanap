@@ -1,3 +1,4 @@
+loadProduct();
 
 //finding which id/product is to be displayed
 function findIdInPage() {
@@ -15,14 +16,14 @@ console.log('id in Url :', findIdInPage());
 function showProduct(product) {
     const itemImageSection = document.querySelector('div.item__img');
     const showProductImage = document.createElement('img');
-    showProductImage.setAttribute('src', product.imageUrl);
+    showProductImage.src = product.imageUrl;
     showProductImage.alt = product.altTxt;
     const itemTitleSection = document.getElementById('title');
-    itemTitleSection.innerHTML = product.name;
+    itemTitleSection.innerText = product.name;
     const itemPriceSection = document.getElementById('price');
-    itemPriceSection.innerHTML = product.price + " ";
+    itemPriceSection.innerText = product.price;
     const itemDescriptionSection = document.getElementById('description');
-    itemDescriptionSection.innerHTML = product.description;
+    itemDescriptionSection.innerText = product.description;
     const itemColorsSection = document.getElementById('colors');
     const colors = Object.values(product.colors);
     console.log(colors);
@@ -34,7 +35,6 @@ function showProduct(product) {
         itemColorsSection.add(selectOptions);
     }
     itemImageSection.appendChild(showProductImage);
-    showProductImage.append(showProductImageAlt);
 };
 
 //getting only one product to show up for each product page
@@ -48,21 +48,31 @@ function loadProduct() {
     })
     .then (function(product) {
         console.log('product :', product);
+        
         showProduct(product);
+        return product;
     })
     .catch (function(err) {
-        //an error occurred
+      console.log('error :', err);
+      alert("Erreur");
     })
 };
-  loadProduct();
 
 
-//filling localstorage for the fisrt time with product id and selected color and amount
+//filling localstorage for the fisrt time with product details
 function populateCart() {
     let selectedProductQuantity = document.getElementById('quantity').value;
     let selectedColor = document.getElementById('colors').value;
   
-    const cart = [{productId : findIdInPage(), amount : selectedProductQuantity, color : selectedColor}] ;
+    const cart = [{productId : findIdInPage(),
+      amount : selectedProductQuantity,
+      color : selectedColor,
+      name : document.getElementById('title').innerText,
+      price : document.getElementById('price').innerText,
+      image : document.querySelector('.item__img img').src,
+      description : document.getElementById('description').innerText,
+      alt : document.querySelector('.item__img img').alt
+    }] ;
   
     if (!localStorage.getItem('cart')) {
         localStorage.setItem('cart', JSON.stringify(cart));
@@ -108,7 +118,12 @@ function checkSameCartItem() {
         {
             productId : findIdInPage(),
             amount : selectedProductQuantity,
-            color : selectedColor
+            color : selectedColor,
+            name :document.getElementById('title').innerText,
+            price : document.getElementById('price').innerText,
+            image : document.querySelector('.item__img img').src,
+            description : document.getElementById('description').innerText,
+            alt : document.querySelector('.item__img img').alt
         },
     );
     localStorage.setItem('cart', JSON.stringify(array));
