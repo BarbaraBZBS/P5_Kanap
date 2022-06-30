@@ -41,21 +41,20 @@ function showProduct(product) {
 function loadProduct() {
     //console.log('id in url :', idInUrl);
     fetch("http://localhost:3000/api/products/" + findIdInPage())
-    .then (function(res) {
-        if (res.ok) {
-            return res.json();
-        }
-    })
-    .then (function(product) {
-        console.log('product :', product);
-        
-        showProduct(product);
-        return product;
-    })
-    .catch (function(err) {
-      console.log('error :', err);
-      alert("Erreur");
-    })
+        .then(function (res) {
+            if (res.ok) {
+                return res.json();
+            }
+        })
+        .then(function (product) {
+            console.log('product :', product);
+            showProduct(product);
+            return product;
+        })
+        .catch(function (err) {
+            console.log('error :', err);
+            alert("Erreur");
+        })
 };
 
 
@@ -63,32 +62,33 @@ function loadProduct() {
 function populateCart() {
     let selectedProductQuantity = document.getElementById('quantity').value;
     let selectedColor = document.getElementById('colors').value;
-  
-    const cart = [{productId : findIdInPage(),
-      amount : selectedProductQuantity,
-      color : selectedColor,
-      name : document.getElementById('title').innerText,
-      price : document.getElementById('price').innerText,
-      image : document.querySelector('.item__img img').src,
-      description : document.getElementById('description').innerText,
-      alt : document.querySelector('.item__img img').alt
-    }] ;
-  
+
+    const cart = [{
+        productId: findIdInPage(),
+        amount: selectedProductQuantity,
+        color: selectedColor,
+        name: document.getElementById('title').innerText,
+        image: document.querySelector('.item__img img').src,
+        description: document.getElementById('description').innerText,
+        alt: document.querySelector('.item__img img').alt
+    }];
+
     if (!localStorage.getItem('cart')) {
         localStorage.setItem('cart', JSON.stringify(cart));
         alert("Article ajouté au panier !");
         console.log('empty cart added new item');
     }
+
     else {
         if (checkSameCartItem() == false) {
-        console.log('not same cart item');
-        addItemToCart();
-        alert("Article ajouté au panier !");
+            console.log('not same cart item');
+            addItemToCart();
+            alert("Article ajouté au panier !");
         }
         else {
-        console.log('same cart item')
-        updateAmount();
-        alert("Cette couleur pour ce modèle se trouve dans le panier, la quantité a été augmentée !");
+            console.log('same cart item')
+            updateAmount();
+            alert("Cette couleur pour ce modèle se trouve dans le panier, la quantité a été augmentée !");
         }
     }
 };
@@ -99,49 +99,48 @@ function checkSameCartItem() {
     let selectedColor = document.getElementById('colors').value;
     let cartToCheck = JSON.parse(localStorage.getItem('cart'));
     for (let item of cartToCheck) {
-      if (item.productId == findIdInPage() && item.color == selectedColor) {
-        checker = true;
-      }
+        if (item.productId == findIdInPage() && item.color == selectedColor) {
+            checker = true;
+        }
     }
     return checker;
-  };
+};
 
-  //adding new item to cart if there is already something in cart
-  function addItemToCart() {
+//adding new item to cart if there is already something in cart
+function addItemToCart() {
     let selectedProductQuantity = document.getElementById('quantity').value;
     let selectedColor = document.getElementById('colors').value;
     let oldCart = JSON.parse(localStorage.getItem('cart'));
-    
+
     const array = Array.from(oldCart);
     //console.log('array :', array);
     array.push(
         {
-            productId : findIdInPage(),
-            amount : selectedProductQuantity,
-            color : selectedColor,
-            name :document.getElementById('title').innerText,
-            price : document.getElementById('price').innerText,
-            image : document.querySelector('.item__img img').src,
-            description : document.getElementById('description').innerText,
-            alt : document.querySelector('.item__img img').alt
+            productId: findIdInPage(),
+            amount: selectedProductQuantity,
+            color: selectedColor,
+            name: document.getElementById('title').innerText,
+            image: document.querySelector('.item__img img').src,
+            description: document.getElementById('description').innerText,
+            alt: document.querySelector('.item__img img').alt
         },
     );
     localStorage.setItem('cart', JSON.stringify(array));
-  };
+};
 
 //updating quantity if same product with same color has already been added to cart
-  function updateAmount() {
+function updateAmount() {
     let selectedProductQuantity = document.getElementById('quantity').value;
     let selectedColor = document.getElementById('colors').value;
     let cartToUpdate = JSON.parse(localStorage.getItem('cart'));
     for (let item of cartToUpdate) {
-      if (item.productId == findIdInPage() && item.color == selectedColor) {
-       item.amount = parseInt(item.amount) + parseInt(selectedProductQuantity);
-      }
+        if (item.productId == findIdInPage() && item.color == selectedColor) {
+            item.amount = parseInt(item.amount) + parseInt(selectedProductQuantity);
+        }
     }
     //localStorage.removeItem('cart');
     localStorage.setItem('cart', JSON.stringify(cartToUpdate));
-  };
+};
 
 //verifying user input value/selection
 function checkInputPopulate() {
@@ -153,17 +152,17 @@ function checkInputPopulate() {
         alert("Choisissez une couleur !");
         return false;
     }
-   else {
-     console.log('ok :');
-     return true;
-   }
+    else {
+        console.log('ok :');
+        return true;
+    }
 };
 
 //clicking addtocart button triggers filling of localstorage
-document.getElementById('addToCart').addEventListener('click', function() {
+document.getElementById('addToCart').addEventListener('click', function () {
     if (checkInputPopulate()) {
-      populateCart();
-      console.log('Storage :', localStorage);
+        populateCart();
+        console.log('Storage :', localStorage);
     }
 });
 
