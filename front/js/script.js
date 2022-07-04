@@ -1,5 +1,8 @@
-// getting all product articles to show up on homepage
-function loadProducts() {
+
+/**
+ * getting all product articles to show up on homepage
+ */
+(function loadProducts() {
     //get data and check validity response
     fetch("http://localhost:3000/api/products")
     .then (function(res) {
@@ -37,5 +40,4 @@ function loadProducts() {
         console.log('error :', err);
         alert("Erreur");
     })
-}
-loadProducts();
+})()

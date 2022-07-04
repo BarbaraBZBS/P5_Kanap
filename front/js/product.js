@@ -1,6 +1,7 @@
-loadProduct();
-
-//finding which id/product is to be displayed
+/**
+ * finding which id/product is to be displayed
+ * @returns {string} Retrieved id in url
+ */
 function findIdInPage() {
     const paramsString = window.location.href;
     const url = new URL(paramsString);
@@ -8,12 +9,13 @@ function findIdInPage() {
     const idInUrl = searchParams.get('id');
     return idInUrl;
 };
-//findIdInPage();
 console.log('id in Url :', findIdInPage());
 
-
-//integrating page html content
-function showProduct(product) {
+/**
+ * integrating page html content
+ * @param {object} product API retrieved array element
+ */
+async function showProduct(product) {
     const itemImageSection = document.querySelector('div.item__img');
     const showProductImage = document.createElement('img');
     showProductImage.src = product.imageUrl;
@@ -37,8 +39,12 @@ function showProduct(product) {
     itemImageSection.appendChild(showProductImage);
 };
 
-//getting only one product to show up for each product page
-function loadProduct() {
+
+/**
+ * calling API to retrieve product
+ * getting only one product to show up for each product page
+ */
+(function loadProduct() {
     //console.log('id in url :', idInUrl);
     fetch("http://localhost:3000/api/products/" + findIdInPage())
         .then(function (res) {
@@ -55,10 +61,12 @@ function loadProduct() {
             console.log('error :', err);
             alert("Erreur");
         })
-};
+})()
 
 
-//filling localstorage for the fisrt time with product details
+/**
+ * filling localstorage for the fisrt time with product details
+ */
 function populateCart() {
     let selectedProductQuantity = document.getElementById('quantity').value;
     let selectedColor = document.getElementById('colors').value;
@@ -93,12 +101,16 @@ function populateCart() {
     }
 };
 
-//verifying if same product with same color is in cart
+/**
+ * verifying if same product with same color is in cart
+ * @returns {boolean} State of product to be added to cart
+ */
 function checkSameCartItem() {
     let checker = false;
     let selectedColor = document.getElementById('colors').value;
     let cartToCheck = JSON.parse(localStorage.getItem('cart'));
     for (let item of cartToCheck) {
+        console.log('cart item :', item);
         if (item.productId == findIdInPage() && item.color == selectedColor) {
             checker = true;
         }
@@ -106,14 +118,16 @@ function checkSameCartItem() {
     return checker;
 };
 
-//adding new item to cart if there is already something in cart
+/**
+ * adding new item to cart if there is already something in cart
+ */
 function addItemToCart() {
     let selectedProductQuantity = document.getElementById('quantity').value;
     let selectedColor = document.getElementById('colors').value;
     let oldCart = JSON.parse(localStorage.getItem('cart'));
-
+    //making sure parsed cart is an array
     const array = Array.from(oldCart);
-    //console.log('array :', array);
+    //console.log('array? :', array);
     array.push(
         {
             productId: findIdInPage(),
@@ -128,7 +142,9 @@ function addItemToCart() {
     localStorage.setItem('cart', JSON.stringify(array));
 };
 
-//updating quantity if same product with same color has already been added to cart
+/**
+ * updating quantity if same product with same color has already been added to cart
+ */
 function updateAmount() {
     let selectedProductQuantity = document.getElementById('quantity').value;
     let selectedColor = document.getElementById('colors').value;
@@ -136,13 +152,16 @@ function updateAmount() {
     for (let item of cartToUpdate) {
         if (item.productId == findIdInPage() && item.color == selectedColor) {
             item.amount = parseInt(item.amount) + parseInt(selectedProductQuantity);
+            console.log('amount :', item.amount)
         }
     }
-    //localStorage.removeItem('cart');
     localStorage.setItem('cart', JSON.stringify(cartToUpdate));
 };
 
-//verifying user input value/selection
+/**
+ * verifying user input value/selection
+ * @returns {boolean} State of user selection
+ */
 function checkInputPopulate() {
     if (document.getElementById('quantity').value == 0 || document.getElementById('quantity').value > 100) {
         alert("Choisissez un nombre d'article(s) entre 1 et 100 !");
@@ -158,7 +177,9 @@ function checkInputPopulate() {
     }
 };
 
-//clicking addtocart button triggers filling of localstorage
+/**
+ * clicking addtocart button triggers filling of localstorage
+ */
 document.getElementById('addToCart').addEventListener('click', function () {
     if (checkInputPopulate()) {
         populateCart();
