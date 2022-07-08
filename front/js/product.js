@@ -1,6 +1,6 @@
 /**
  * finding which id/product is to be displayed
- * @returns {string} Retrieved id in url
+ * @returns {idInUrl} Retrieved id in url
  */
 function findIdInPage() {
     const paramsString = window.location.href;
@@ -11,11 +11,45 @@ function findIdInPage() {
 };
 console.log('id in Url :', findIdInPage());
 
+document.addEventListener('DOMContentLoaded', function () {
+    load();
+});
+
+/**
+ * Loading product to display 
+ */
+async function load() {
+    const product = await getProduct();
+    console.log('product', product)
+    showProduct(product);
+}
+
+/**
+ * calling API to get product info
+ * @returns {product} API product by id
+ */
+function getProduct() {
+    return fetch("http://localhost:3000/api/products/" + findIdInPage())
+        .then(function (res) {
+            if (res.ok) {
+                return res.json();
+            }
+        })
+        .then(function (product) {
+            console.log('product :', product);
+            return product;
+        })
+        .catch(function (err) {
+            console.log('error :', err);
+            alert("Erreur");
+        })
+}
+
 /**
  * integrating page html content
  * @param {object} product API retrieved array element
  */
-async function showProduct(product) {
+function showProduct(product) {
     const itemImageSection = document.querySelector('div.item__img');
     const showProductImage = document.createElement('img');
     showProductImage.src = product.imageUrl;
@@ -41,31 +75,7 @@ async function showProduct(product) {
 
 
 /**
- * calling API to retrieve product
- * getting only one product to show up for each product page
- */
-(function loadProduct() {
-    //console.log('id in url :', idInUrl);
-    fetch("http://localhost:3000/api/products/" + findIdInPage())
-        .then(function (res) {
-            if (res.ok) {
-                return res.json();
-            }
-        })
-        .then(function (product) {
-            console.log('product :', product);
-            showProduct(product);
-            return product;
-        })
-        .catch(function (err) {
-            console.log('error :', err);
-            alert("Erreur");
-        })
-})()
-
-
-/**
- * filling localstorage for the fisrt time with product details
+ * filling localstorage for the first time with product details
  */
 function populateCart() {
     let selectedProductQuantity = document.getElementById('quantity').value;
