@@ -1,345 +1,207 @@
 /**
  * verifying local storage condition
+ * @returns {boolean} localStorage condition
  */
-(function checkLocalStorage() {
+function checkLocalStorage() {
+    console.log("checkLocalStorage");
     if (!localStorage.getItem("cart")) {
-      console.log("localStorage VIDE !");
-      alert("Votre panier est vide, selectionnez un produit depuis la page d'accueil et ajoutez le à votre panier !");
-    }
-    else {
-      console.log("Storage :", JSON.parse(localStorage.getItem("cart")));
-      load();
-    }
-})()
-
-/**
- * loading each card of cart
- */
-async function load () {
-    const cartItems = await getCartItems();
-    for (let cartItem of cartItems) {
-        showCartItem(cartItem)
+        console.log("localStorage VIDE !");
+        alert(
+            "Votre panier est vide, selectionnez un produit depuis la page d'accueil et ajoutez le à votre panier !"
+        );
+        return false;
+    } else {
+        console.log("Storage :", JSON.parse(localStorage.getItem("cart")));
+        return true;
     }
 }
 
 /**
- * getting storage elements
- * @returns {cartItems} LocalStorage Array
+ * cart setter for cart page (picking infos in local storage and API)
+ * @param {Array} infosAPI products array from API
+ * @returns {myCart} array of set cart infos 
  */
-function getCartItems() {
-    let cartItems = JSON.parse(localStorage.getItem('cart'));
-    if (cartItems != null) {
-        return cartItems;
+function setCart(infosAPI) {
+    console.log("infosAPI", infosAPI);
+    let locStorage = JSON.parse(localStorage.getItem("cart"));
+    //console.log('locStorage', locStorage);
+    /* loop to retrieve missing price info */
+    for (let item of locStorage) {
+        //console.log(item)
+        let productDetail = infosAPI.find(function (detail) {
+            // find needed product
+            return detail._id == item.productId;
+        });
+        console.log(productDetail.price);
+        item.price = productDetail.price;
+        myCart.push(item);
     }
-    else {
-        alert("Votre panier est vide, selectionnez un produit depuis la page d'accueil et ajoutez le à votre panier !")
+    console.log("myCart", myCart);
+    return myCart;
+}
+
+/**
+ * filling DOM/HTML
+ */
+function setHtmlContentProduct() {
+    console.log("setHtmlContentProduct");
+    if (myCart.length > 0) {
+        let txtHtml = "";
+        for (const row of myCart) {
+            //console.log(row.id);
+            txtHtml += `<article class="cart__item" data-id="${row.productId}" data-color="${row.color}">
+    <div class="cart__item__img">
+        <img src="${row.image}" alt="${row.alt}">
+    </div >
+    <div class="cart__item__content">
+        <div class="cart__item__content__description">
+            <h2>${row.name}</h2>
+            <p>${row.color}</p>
+            <p>${row.price * row.amount} €</p>
+        </div>
+        <div class="cart__item__content__settings">
+            <div class="cart__item__content__settings__quantity">
+                <p>Qté : </p>
+                <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${row.amount}">
+            </div>
+            <div class="cart__item__content__settings__delete">
+                <p class="deleteItem">Supprimer</p>
+            </div>
+        </div >
+    </div >
+</article >`;
+        }
+        document.getElementById("cart__items").innerHTML = txtHtml;
     }
 }
 
 /**
- * computing total price in each card
- * @param {object} cartItem LocaStorage Array element
- * @param {string} price API product price retrieved
- * @returns {number} Computed total of cart item prices
+ * compute setter for price of all products
  */
-function totalCartItemPrice(cartItem, price) {
-    //computing price multiplied by amount converted to integer
-    let totalCartItemPrice = parseInt(price) * parseInt(cartItem.amount);
-    console.log("item price :", price);
-    console.log("item amount :", cartItem.amount);
-    return totalCartItemPrice
-}
-
-/**
- * computing sum of items in each card
- */
-function sumCartItems() {
-    // getting item quantity info from DOM elements
-    let numberOfItems = document.getElementsByClassName('itemQuantity');
-    console.log('products amount :', numberOfItems);
-    //looping to make use of info array
-    let totalAmount = 0;
-    for (let item of numberOfItems) {
-        //console.log(item);
-        //console.log(item.value);
-        //console.log(typeof(item.value));
-        //computing sum of amount
-        totalAmount += parseInt(item.value);
+function setPriceForAllProducts() {
+    console.log("setPriceForAllProducts");
+    let finalPrice = 0;
+    for (const row of myCart) {
+        finalPrice += parseInt(row.price) * parseInt(row.amount)
     }
-    console.log('tot :', totalAmount);
-    //updating DOM with sum of items
-    document.getElementById('totalQuantity').innerText = totalAmount;
+    document.getElementById("totalPrice").textContent = finalPrice
 }
 
 /**
- * computing sum of items prices
+ * compute setter for total number of products
  */
-function totalPrice() {
-    //getting item price info from DOM elements
-    let itemsPrices = document.querySelectorAll('div.cart__item__content__description p:nth-child(3)');
-    console.log('found prices :', itemsPrices);
-    //looping to make use of info array
-    let totalOfPrices = 0;
-    for (let itemPrice of itemsPrices) {
-      console.log('found price : ', itemPrice);
-      //finding required value
-      console.log('price value? :', itemPrice.innerText);
-      let priceInfo = itemPrice.innerText;
-      console.log('still price value? :', priceInfo);
-      //extracting number from value
-      let replaced = priceInfo.replace(/\D/g, '');
-      console.log("replaced number extracted:", replaced)
-      //computing sum of prices
-      totalOfPrices += parseInt(replaced);
+function setAmountForAllProducts() {
+    console.log("setAmountForAllProducts");
+    let total = 0;
+    for (const row of myCart) {
+        total += parseInt(row.amount)
     }
-    console.log('total :', totalOfPrices);
-    //updating DOM with sum of prices
-   document.getElementById('totalPrice').innerText = totalOfPrices;
-    };
-
-/**
- * creating new article
- * @param {object} cartItem LocaStorage Array element
- * @returns {showArticle} Article HTML content
- */
-function createArticle(cartItem) {
-    const showArticle = document.createElement('article');
-    showArticle.classList.add('cart__item');
-    showArticle.dataset.id = cartItem.productId;
-    console.log('data-id :', showArticle.dataset.id);
-    showArticle.dataset.color = cartItem.color;
-    console.log('data-color :', showArticle.dataset.color);
-    return showArticle;
+    document.getElementById("totalQuantity").innerText = total
 }
 
 /**
- * creating new image section
- * @param {object} cartItem LocaStorage Array element
- * @returns {showImgDiv} Image HTML content
+ * setter for product amount update
+ * @returns {myCart} array of set cart infos
  */
-function createImage(cartItem) {
-    const showImgDiv = document.createElement('div');
-    const showImage = document.createElement('img');
-    showImgDiv.classList.add('cart__item__img');
-    showImage.src = cartItem.image;
-    showImage.alt = cartItem.alt;
-    showImgDiv.appendChild(showImage);
-    return showImgDiv
+function setQtyForOneProduct() {
+    console.log("setQtyClick");
+    let amountBtn = document.getElementsByClassName("itemQuantity");
+    console.log(amountBtn);
+    let cartProductId;
+    let cartProductColor;
+    let cartProductAmount;
+    if (amountBtn.length > 0) {
+        for (const row of amountBtn) {
+            console.log("amount button :", row);
+            row.addEventListener("change", function (e) {
+                cartProductId = e.target.closest("article").dataset.id;
+                cartProductColor = e.target.closest("article").dataset.color;
+                cartProductAmount = row.value;
+                console.log(cartProductId);
+                console.log(cartProductAmount);
+                let itemPrices = document.querySelectorAll('div.cart__item__content__description p:nth-child(3)');
+                let idx = 0;
+                for (const row of myCart) {
+                    if (row.productId == cartProductId && row.color == cartProductColor) {
+                        console.log(row.productId);
+                        console.log(row.color);
+                        console.log("MODIFICATION de la quantité pour : " + row.name + " " + row.color);
+                        alert("MODIFICATION de la quantité pour : " + row.name + " " + row.color);
+                        row.amount = cartProductAmount;
+                        console.log('find prices', itemPrices);
+                        console.log('found index', idx);
+                        console.log('price to update', itemPrices[idx]);
+                        itemPrices[idx].textContent = parseInt(row.amount) * parseInt(row.price) + " €";
+                    }
+                    idx++;
+                }
+                /** updating DOM **/
+                setAmountForAllProducts();
+                setPriceForAllProducts();
+            })
+        }
+        return myCart;
+    }
 }
 
 /**
- * creating new settings section
- * @param {object} cartItem LocaStorage Array element
- * @returns {showSettingsDiv} Settings div HTML content
+ * chosen product removal 
+ * @returns {myCart} array of set cart infos
  */
-function createItemSettings(cartItem) {
-    const showSettingsDiv = document.createElement('div');
-    const showSetQuantityDiv = document.createElement('div');
-    const showQuantityParagraph = document.createElement('p');
-    const showInput = document.createElement('input');
-    showSettingsDiv.classList.add('cart__item__content__settings'); showSetQuantityDiv.classList.add('cart__item__content__settings__quantity');
-    showQuantityParagraph.innerText = "Qté: ";
-    showInput.setAttribute('type', 'number');
-    showInput.classList.add('itemQuantity');
-    showInput.setAttribute('name', 'itemQuantity');
-    showInput.setAttribute('min', '1');
-    showInput.setAttribute('max', '100');
-    showInput.setAttribute('value', cartItem.amount);
-    showSettingsDiv.appendChild(showSetQuantityDiv);
-    showSetQuantityDiv.appendChild(showQuantityParagraph);
-    showSetQuantityDiv.appendChild(showInput);
-    return showSettingsDiv
+function removeOneProduct() {
+    console.log("removeOneProduct");
+    let deleteBtn = document.getElementsByClassName("deleteItem");
+    //console.log(deleteBtn);
+    let cartProductId;
+    if (deleteBtn.length > 0) {
+        for (const row of deleteBtn) {
+            row.addEventListener("click", function (evt) {
+                cartProductId = evt.target.closest("article").dataset.id;
+                console.log(cartProductId);
+                /** loop for cart product removal **/
+                let idx = 0;
+                for (const row of myCart) {
+                    if (row.productId == cartProductId) {
+                        console.log("SUPPRESSION du panier : " + row.name + " " + row.color);
+                        alert("SUPPRESSION du panier : " + row.name + " " + row.color);
+                        myCart.splice(idx, 1);
+                        console.log('index', idx);
+                    }
+                    idx++;
+                }
+                /** updating DOM **/
+                evt.target.closest("article").remove();
+                setAmountForAllProducts();
+                setPriceForAllProducts();
+            });
+        }
+        return myCart;
+    }
 }
 
-/**
- * creating new delete settings section
- * @param {object} cartItem 
- * @returns {showSettingsDeleteDiv} Delete settings div HTML content
- */
-function createItemSettingsDelete(cartItem) {
-    const showSettingsDeleteDiv = document.createElement('div');
-    const showSetDeleteParagraph = document.createElement('p'); showSettingsDeleteDiv.classList.add('cart__item__content__settings__delete');
-    showSetDeleteParagraph.classList.add('deleteItem');
-    showSetDeleteParagraph.innerText = "Supprimer";
-    showSettingsDeleteDiv.appendChild(showSetDeleteParagraph);
-    return showSettingsDeleteDiv
-}
-
-/**
- * displaying html content for cart
- * @param {object} cartItem LocaStorage Array element
- */
- function showCartItem(cartItem) {
-    //calling API to display prices
-    //get data promise check validity response and catch error
+/***** page loading *****/
+let myCart = [];
+if (checkLocalStorage()) {
     fetch("http://localhost:3000/api/products")
-        .then(function (res) {
-            if (res.ok) {
-                return res.json();
-            }
+        .then((response) => {
+            console.log(response);
+            return response.json();
         })
-        .then(function (products) {
-            for (let product of products) {
-                let id = product._id;
-                let price = product.price;
-
-                if (id == cartItem.productId) {
-                    //calling functions to create elements
-                    const showArticle = createArticle(cartItem);
-                    const showImgDiv = createImage(cartItem);
-                    const showSettingsDiv = createItemSettings(cartItem);
-                    const showSettingsDeleteDiv = createItemSettingsDelete(cartItem);
-                    //creating description section
-                    const cartItemsSection = document.getElementById('cart__items');
-                    const showContentDiv = document.createElement('div');
-                    const showDescriptionDiv = document.createElement('div');
-                    const showHeading = document.createElement('h2');
-                    const showColorParagraph = document.createElement('p');
-                    const showPriceParagraph = document.createElement('p');
-                    showContentDiv.classList.add('cart__item__content'); showDescriptionDiv.classList.add('cart__item__content__description');
-                    showHeading.innerText = cartItem.name;
-                    showColorParagraph.innerText = cartItem.color;
-                    showPriceParagraph.innerText = totalCartItemPrice(cartItem, price) + " €";
-                    showContentDiv.appendChild(showDescriptionDiv);
-                    showDescriptionDiv.appendChild(showHeading);
-                    showDescriptionDiv.appendChild(showColorParagraph);
-                    showDescriptionDiv.appendChild(showPriceParagraph);
-                    showArticle.appendChild(showImgDiv);
-                    showArticle.appendChild(showContentDiv);
-                    showContentDiv.appendChild(showSettingsDiv);
-                    showContentDiv.appendChild(showSettingsDeleteDiv);
-                    cartItemsSection.appendChild(showArticle);
-                    //calling functions to display computed infos
-                    sumCartItems();
-                    totalPrice();
-                    //calling functions for clickable buttons
-                    removeCartItem();
-                    updateItemAmount();
-                }
-            }
+        .then((data) => {
+            //console.log(response)
+            myCart = setCart(data);
+            setHtmlContentProduct();
+            setAmountForAllProducts();
+            setPriceForAllProducts();
+            /**** EVENTS ****/
+            myCart = removeOneProduct();
+            myCart = setQtyForOneProduct();
         })
-        .catch(function (err) {
-            console.log("an error occurred", err);
-            //alert("erreur")
-        })
-};
-
-
-/**
- * making delete buttons functional
- */
-function removeCartItem() {
-    // finding delete buttons in DOM
-    let deleteButtons = document.getElementsByClassName('deleteItem');
-    let itemId;
-    let itemColor;
-    if (deleteButtons.length > 0) {
-        //looping to work with each button
-        for (let button of deleteButtons) {
-            console.log('delete button :', button);
-            //adding event listener to button
-            button.addEventListener('click', function (e) {
-                itemId = e.target.closest('article').dataset.id;
-                itemColor = e.target.closest('article').dataset.color;
-                console.log('id of item :', itemId);
-                console.log('color of item :', itemColor);
-                //removing article from DOM
-                e.target.closest('article').remove();
-                //removing item from localStorage
-                let cartItemsCheck = JSON.parse(localStorage.getItem('cart'));
-                let filtered = cartItemsCheck.filter(element => {
-                    return element.productId === itemId && element.color != itemColor || element.productId != itemId && element.color != itemColor;
-                });
-                console.log('filtered :', filtered);
-                console.log('cart :', cartItemsCheck);
-                localStorage.setItem('cart', JSON.stringify(filtered));
-                console.log('new cart :', JSON.parse(localStorage.getItem('cart')));
-                //computing price and products amount again
-                sumCartItems();
-                totalPrice();
-            })
-        }
-    }
-    else {
-
-    }
-};
-
-/**
- * making item amount input selection functional
- */
-function updateItemAmount() {
-    let amountButtons = document.getElementsByClassName('itemQuantity');
-    let itemId;
-    let itemColor;
-    let itemValue;
-    if (amountButtons.length > 0) {
-        for (let button of amountButtons) {
-            console.log('amount button :', button);
-            button.addEventListener('change', function (e) {
-                itemId = e.target.closest('article').dataset.id;
-                itemColor = e.target.closest('article').dataset.color;
-                itemValue = button.value;
-                console.log('id of item :', itemId);
-                console.log('color of item :', itemColor);
-                console.log('item amount :', itemValue);
-                let cartItemsUpdate = JSON.parse(localStorage.getItem('cart'));
-                for (let item of cartItemsUpdate) {
-                    if (item.productId == itemId && item.color == itemColor) {
-                        item.amount = itemValue;
-                        console.log('new amount :', item.amount);
-                        console.log('cart :', cartItemsUpdate);
-                    };
-                    localStorage.setItem('cart', JSON.stringify(cartItemsUpdate));
-                    console.log('new cart ok?:', JSON.parse(localStorage.getItem('cart')));
-                    //computing price and products amount again
-                    sumCartItems();
-                    totalPrice();
-                    location.reload(true);
-                }
-            })
-        }
-    }
+        .catch((error) => {
+            console.log("Erreur : requête API", error);
+            alert("Erreur !");
+        });
 }
 
 
 
-//for form =>
-//  document.getElementById('firstNameErrorMsg').innerText = "Veuillez renseigner votre prénom... ";
-//  document.getElementById('lastNameErrorMsg').innerText = "Veuillez renseigner votre nom... ";
-//  document.getElementById('addressErrorMsg').innerText = "Veuillez renseigner votre adresse... ";
-//  document.getElementById('cityErrorMsg').innerText = "Veuillez renseigner votre ville... ";
-//  document.getElementById('emailErrorMsg').innerText = "Veuillez renseigner une adresse email valide...";
-
-
-
-// //computing total price in each card
-// function totalCartItemPrice() {
-//     let idk;
-//       let itemsPrices = document.querySelectorAll('div.cart__item__content__description p:nth-child(3)');
-//     console.log('found prices :', itemsPrices);
-//     //looping to make use of info array
-//     for (let itemPrice of itemsPrices) {
-//       console.log('found price : ', itemPrice);
-//       //finding required value
-//       //console.log('price value? :', itemPrice.innerText);
-//       let priceInfo = itemPrice.innerText;
-//       //console.log('still price value? :', priceInfo);
-//       //extracting number from value
-//       let replaced = priceInfo.replace(/\D/g, '');
-//       console.log("replaced number extracted:", replaced)
-//       //let priceId = itemPrice.closest('article').dataset.id;
-//       console.log('price id :', priceId);
-//       let numberOfItems = document.getElementsByClassName('itemQuantity');
-//       console.log('num items :', numberOfItems);
-//       for (let product of numberOfItems) {
-//         idk = product.value
-//         console.log('idk :', idk)
-//         console.log('compute :', parseInt(idk) * parseInt(replaced) );
-//         //itemPrice.innerText = parseInt(idk) * parseInt(replaced);
-//       }
-//       console.log('idk :', idk);
-//       itemPrice.innerText = parseInt(idk) * parseInt(replaced);
-//       }
-  
-//   }
