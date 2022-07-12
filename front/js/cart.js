@@ -12,6 +12,11 @@ function checkLocalStorage() {
         return false;
     } else {
         console.log("Storage :", JSON.parse(localStorage.getItem("cart")));
+        formFirstName();
+        formLastName();
+        formAddress();
+        formCity();
+        formEmail();    
         return true;
     }
 }
@@ -204,4 +209,197 @@ if (checkLocalStorage()) {
 }
 
 
+////-------------------------------------FORM------------------------------------------------////
 
+/**
+ * firstName field validation
+ */
+function formFirstName() {
+  const firstName = document.getElementById('firstName');
+  firstName.addEventListener('change', function(e) {
+    if (/^[A-Z][A-Za-z -ïîëéèùôö]{1,45}$/.test(e.target.value)) {
+      document.getElementById('firstNameErrorMsg').textContent = "";
+      firstName.style.border = 'solid medium green';
+      document.getElementById('order').removeAttribute('disabled');
+    }
+    else if (e.target.value == ''){
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+    else {
+      document.getElementById('firstNameErrorMsg').textContent = "Veuillez renseigner votre prénom... (p. ex. Gregory)";
+      firstName.style.border = 'solid thin red';
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+  })
+}
+
+/**
+ * lastName field validation
+ */
+function formLastName() {
+  const lastName = document.getElementById('lastName');
+  lastName.addEventListener('change', function(e) {
+    if (/^[A-Z][A-Za-z -ïîëéèùôö]{1,45}$/.test(e.target.value)) {
+      document.getElementById('lastNameErrorMsg').textContent = "";
+      lastName.style.border = 'solid medium green';
+      document.getElementById('order').removeAttribute('disabled');
+    }
+    else if (e.target.value == ''){
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+    else {
+      document.getElementById('lastNameErrorMsg').textContent = "Veuillez renseigner votre nom... (p. ex. Lambert)";
+      lastName.style.border = 'solid thin red';
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+  })
+}
+
+/**
+ * address field validation
+ */
+function formAddress() {
+  let address = document.getElementById('address');
+  address.addEventListener('change', function(e) {
+    if (/^[a-zA-Z0-9\s,'-.ç _àçïîëéèùôöç]*$/.test(e.target.value)) {
+      document.getElementById('addressErrorMsg').textContent = "";
+      address.style.border = 'solid medium green';
+      document.getElementById('order').removeAttribute('disabled');
+    }
+    else if (e.target.value == ''){
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+    else {
+      document.getElementById('addressErrorMsg').textContent = "Veuillez renseigner votre adresse... (p. ex. 10 rue du pommier)";
+      address.style.border = 'solid thin red';
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+  })
+}
+
+/**
+ * city field validation
+ */
+function formCity() {
+  let city = document.getElementById('city');
+  city.addEventListener('change', function(e) {
+    if (/^[A-Z][A-Za-z\s'-. _]*$/.test(e.target.value)) {
+      document.getElementById('cityErrorMsg').textContent = "";
+      city.style.border = 'solid medium green';
+      document.getElementById('order').removeAttribute('disabled');
+    }
+    else if (e.target.value == ''){
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+    else {
+      document.getElementById('cityErrorMsg').textContent = "Veuillez renseigner votre ville... (p. ex. Grenoble)";
+      city.style.border = 'solid thin red';
+      document.getElementById('order').setAttribute('disabled', 'true');
+
+    }
+  })
+}
+
+/**
+ * email field validation
+ */
+function formEmail() {
+  let email = document.getElementById('email');
+  email.addEventListener('change', function(e) {
+    if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(e.target.value)) {
+      document.getElementById('emailErrorMsg').textContent = "";
+      email.style.border = 'solid medium green';
+      document.getElementById('order').removeAttribute('disabled');
+    }
+    else if (e.target.value == ''){
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+    else {
+      document.getElementById('emailErrorMsg').textContent = "Veuillez renseigner une adresse email valide... (p. ex. j.vincent@google.org)";
+      email.style.border = 'solid thin red';
+      document.getElementById('order').setAttribute('disabled', 'true');
+    }
+  })
+}
+
+/**
+ * sending form
+ * @param {object} e event listener
+ */
+function sendForm(e) {
+  let form = document.querySelector('.cart__order__form');
+  e.preventDefault();
+  console.log('form :', form);
+  let valid = form.checkValidity();
+  console.log('validity', valid);
+  if (valid == true) {
+      console.log('validity', valid);
+      const formOrder = requestForm();
+      console.log('order', formOrder);
+          fetch("http://localhost:3000/api/products/order/",
+          {
+           method : 'POST',
+           headers : {
+             'Accept' : 'application/json',
+             'Content-Type' : 'application/json'
+          },
+          body : JSON.stringify(formOrder)
+         })
+         .then(function(res) {
+            if (res.ok) {
+              console.log('res', res)
+            return res.json();
+         }
+         })
+         .then(function(formOrder) {
+            alert("Merci pour votre commande !");
+           console.log('success :', formOrder);
+           location.href = 'confirmation.html';
+           //localStorage.clear();
+           console.log('storage', JSON.parse(localStorage.getItem("cart")));
+
+         })
+         .catch(function(err) {
+           console.log("an error occurred", err);
+           //alert("erreur")
+         })
+  }
+}
+
+/**
+ * building post request element
+ * @returns {object} formOrder built post request
+ */
+function requestForm() {
+    const formOrder = { 
+        contact : {
+        firstName : document.getElementById('firstName').value,
+        lastName : document.getElementById('lastName').value,
+        address: document.getElementById('address').value,
+        city : document.getElementById('city').value,
+        email : document.getElementById('email').value
+      },
+      products : requestIds(),
+    }
+    return formOrder
+}
+
+/**
+ * retrieving item ids needed while building post element
+ * @returns {array} getIds found ids
+ */
+function requestIds() {
+    const getIds = [];
+    for (let row of myCart) {
+        const ids = row.productId;
+        let onlyIds = ids.split();
+        console.log('ids split', onlyIds);
+        getIds.push(onlyIds)
+    }
+    return getIds
+}
+
+/**
+ * form event listener
+ */
+ document.querySelector('.cart__order__form').addEventListener('submit', sendForm);
