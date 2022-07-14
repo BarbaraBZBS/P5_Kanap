@@ -324,7 +324,7 @@ function formEmail() {
 
 /**
  * sending form
- * @param {object} e event listener
+ * @param {object} e event for even listener
  */
 function sendForm(e) {
   let form = document.querySelector('.cart__order__form');
@@ -354,8 +354,7 @@ function sendForm(e) {
          .then(function(formOrder) {
             alert("Merci pour votre commande !");
            console.log('success :', formOrder);
-           location.href = 'confirmation.html';
-           //localStorage.clear();
+           location.href = 'confirmation.html?id=' + formOrder.orderId;
            console.log('storage', JSON.parse(localStorage.getItem("cart")));
 
          })
