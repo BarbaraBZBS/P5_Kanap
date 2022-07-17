@@ -9,7 +9,7 @@ function findIdInPage() {
     const idInUrl = searchParams.get('id');
     return idInUrl;
 };
-console.log('id in Url :', findIdInPage());
+//console.log('id in Url :', findIdInPage());
 
 document.addEventListener('DOMContentLoaded', function () {
     load();
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
  */
 async function load() {
     const product = await getProduct();
-    console.log('product', product)
+    //console.log('product', product)
     showProduct(product);
 }
 
@@ -36,7 +36,7 @@ function getProduct() {
             }
         })
         .then(function (product) {
-            console.log('product :', product);
+            //console.log('product :', product);
             return product;
         })
         .catch(function (err) {
@@ -57,14 +57,14 @@ function showProduct(product) {
     const itemTitleSection = document.getElementById('title');
     itemTitleSection.innerText = product.name;
     const itemPriceSection = document.getElementById('price');
-    itemPriceSection.innerText = product.price;
+    itemPriceSection.innerText = product.price + " ";
     const itemDescriptionSection = document.getElementById('description');
     itemDescriptionSection.innerText = product.description;
     const itemColorsSection = document.getElementById('colors');
     const colors = Object.values(product.colors);
-    console.log(colors);
+    //console.log(colors);
     for (let color of colors) {
-        console.log(color);
+        //console.log(color);
         const selectOptions = document.createElement('option');
         selectOptions.value = color;
         selectOptions.text = color;
@@ -93,6 +93,7 @@ function populateCart() {
 
     if (!localStorage.getItem('cart')) {
         localStorage.setItem('cart', JSON.stringify(cart));
+        //console.log(selectedColor, selectedProductQuantity);
         alert("Article ajouté au panier !");
         console.log('empty cart added new item');
     }
@@ -100,11 +101,13 @@ function populateCart() {
     else {
         if (checkSameCartItem() == false) {
             console.log('not same cart item');
+            //console.log(selectedColor, selectedProductQuantity);
             addItemToCart();
             alert("Article ajouté au panier !");
         }
         else {
-            console.log('same cart item')
+            console.log('same cart item');
+            //console.log(selectedColor, selectedProductQuantity);
             updateAmount();
             alert("Cette couleur pour ce modèle se trouve dans le panier, la quantité a été augmentée !");
         }
@@ -120,7 +123,7 @@ function checkSameCartItem() {
     let selectedColor = document.getElementById('colors').value;
     let cartToCheck = JSON.parse(localStorage.getItem('cart'));
     for (let item of cartToCheck) {
-        console.log('cart item :', item);
+        //console.log('cart item :', item);
         if (item.productId == findIdInPage() && item.color == selectedColor) {
             checker = true;
         }
@@ -162,7 +165,7 @@ function updateAmount() {
     for (let item of cartToUpdate) {
         if (item.productId == findIdInPage() && item.color == selectedColor) {
             item.amount = parseInt(item.amount) + parseInt(selectedProductQuantity);
-            console.log('amount :', item.amount)
+            //console.log('amount :', item.amount)
         }
     }
     localStorage.setItem('cart', JSON.stringify(cartToUpdate));
@@ -182,7 +185,7 @@ function checkInputPopulate() {
         return false;
     }
     else {
-        console.log('ok :');
+        //console.log('ok');
         return true;
     }
 };
@@ -193,7 +196,7 @@ function checkInputPopulate() {
 document.getElementById('addToCart').addEventListener('click', function () {
     if (checkInputPopulate()) {
         populateCart();
-        console.log('Storage :', localStorage);
+        //console.log('Storage :', localStorage);
     }
 });
 

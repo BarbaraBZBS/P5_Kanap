@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
  */
 async function load() {
     const products = await getProducts();
-    console.log('products :', products);
+    //console.log('products :', products);
     for (let product of products) {
         showProduct(product)
     }
@@ -29,7 +29,7 @@ function getProducts() {
             }
         })
         .then(function (products) {
-            console.log('products :', products);
+            //console.log('products :', products);
             return products
         })
         .catch(function (err) {
@@ -43,6 +43,7 @@ function getProducts() {
  * @param {object} product API retrieved product to display 
  */
 function showProduct(product) {
+    //console.log('product :', product)
     const itemsSection = document.getElementById('items');
     const showAnchor = document.createElement('a');
     const showArticle = document.createElement('article');

@@ -9,12 +9,12 @@ function findOrderId() {
     const idInUrl = searchParams.get('id');
     return idInUrl;
 };
-console.log('id in Url :', findOrderId());
+//console.log('id in Url :', findOrderId());
 
 /**
  *  Page loading
  */
- document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     loadOrderNumber();
 });
 
