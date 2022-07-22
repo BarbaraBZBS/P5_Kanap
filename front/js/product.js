@@ -176,7 +176,8 @@ function updateAmount() {
  * @returns {boolean} State of user selection
  */
 function checkInputPopulate() {
-    if (document.getElementById('quantity').value == 0 || document.getElementById('quantity').value > 100) {
+    let amountInput = document.getElementById('quantity') ;
+    if (amountInput.value == 0 || amountInput.value > 100 || amountInput.value < 0) {
         alert("Choisissez un nombre d'article(s) entre 1 et 100 !");
         return false;
     }

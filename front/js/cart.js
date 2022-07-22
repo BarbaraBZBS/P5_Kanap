@@ -127,36 +127,42 @@ function setQtyForOneProduct() {
                 //console.log(cartProductId);
                 //console.log(cartProductColor);
                 //console.log(cartProductAmount);
-                /**storage update**/
-                let cartItemsUpdate = JSON.parse(localStorage.getItem('cart'));
-                for (let item of cartItemsUpdate) {
-                    if (item.productId == cartProductId && item.color == cartProductColor) {
-                        item.amount = cartProductAmount;
-                        console.log('new amount :', item.amount);
-                        console.log('cart :', cartItemsUpdate);
-                    }
+                if (row.value == 0 || row.value < 0 || row.value == "" || row.value > 100) {
+                    alert("Choisissez une nouvelle quantité comprise entre 1 et 100 !");
+                    return cartProductAmount
                 }
-                localStorage.setItem('cart', JSON.stringify(cartItemsUpdate));
-                /**myCart update**/
-                let itemPrices = document.querySelectorAll('div.cart__item__content__description p:nth-child(3)');
-                let idx = 0;
-                for (const row of myCart) {
-                    if (row.productId == cartProductId && row.color == cartProductColor) {
-                        //console.log(row.productId);
-                        //console.log(row.color);
-                        console.log("MODIFICATION de la quantité pour : " + row.name + " " + row.color);
-                        alert("MODIFICATION de la quantité pour : " + row.name + " " + row.color);
-                        row.amount = cartProductAmount;
-                        //console.log('find prices', itemPrices);
-                        //console.log('found index', idx);
-                        //console.log('price to update', itemPrices[idx]);
-                        itemPrices[idx].textContent = parseInt(row.amount) * parseInt(row.price) + " €";
+                else {
+                    /**storage update**/
+                    let cartItemsUpdate = JSON.parse(localStorage.getItem('cart'));
+                    for (let item of cartItemsUpdate) {
+                        if (item.productId == cartProductId && item.color == cartProductColor) {
+                            item.amount = cartProductAmount;
+                            console.log('new amount :', item.amount);
+                            console.log('cart :', cartItemsUpdate);
+                        }
                     }
-                    idx++;
+                    localStorage.setItem('cart', JSON.stringify(cartItemsUpdate));
+                    /**myCart update**/
+                    let itemPrices = document.querySelectorAll('div.cart__item__content__description p:nth-child(3)');
+                    let idx = 0;
+                    for (const row of myCart) {
+                        if (row.productId == cartProductId && row.color == cartProductColor) {
+                            //console.log(row.productId);
+                            //console.log(row.color);
+                            console.log("MODIFICATION de la quantité pour : " + row.name + " " + row.color);
+                            //alert("MODIFICATION de la quantité pour : " + row.name + " " + row.color);
+                            row.amount = cartProductAmount;
+                            //console.log('find prices', itemPrices);
+                            //console.log('found index', idx);
+                            //console.log('price to update', itemPrices[idx]);
+                            itemPrices[idx].textContent = parseInt(row.amount) * parseInt(row.price) + " €";
+                        }
+                        idx++;
+                    }
+                    /** updating DOM **/
+                    setAmountForAllProducts();
+                    setPriceForAllProducts();
                 }
-                /** updating DOM **/
-                setAmountForAllProducts();
-                setPriceForAllProducts();
             })
         }
         return myCart;
@@ -180,7 +186,6 @@ function removeOneProduct() {
                 cartProductColor = e.target.closest('article').dataset.color;
                 //console.log(cartProductId);
                 //console.log(cartProductColor);
-
                 let cartItemsCheck = JSON.parse(localStorage.getItem('cart'));
                 let filtered = cartItemsCheck.filter(element => {
                     return element.productId === cartProductId && element.color != cartProductColor
@@ -193,7 +198,7 @@ function removeOneProduct() {
                 for (const row of myCart) {
                     if (row.productId == cartProductId && row.color == cartProductColor) {
                         console.log("SUPPRESSION du panier : " + row.name + " " + row.color);
-                        alert("SUPPRESSION du panier : " + row.name + " " + row.color);
+                        //alert("SUPPRESSION du panier : " + row.name + " " + row.color);
                         myCart.splice(idx, 1);
                         //console.log('index', idx);
                     }
@@ -242,7 +247,7 @@ if (checkLocalStorage()) {
 function formFirstName() {
     const firstName = document.getElementById('firstName');
     firstName.addEventListener('change', function (e) {
-        if (/^[A-Z][A-Za-z -ïîëéèùôö]{1,45}$/.test(e.target.value)) {
+        if (/^[A-Z][A-Za-z -ïîëéèùûêâôöçäü]{1,45}$/.test(e.target.value)) {
             document.getElementById('firstNameErrorMsg').textContent = "";
             firstName.style.border = 'solid medium green';
             document.getElementById('order').removeAttribute('disabled');
@@ -264,7 +269,7 @@ function formFirstName() {
 function formLastName() {
     const lastName = document.getElementById('lastName');
     lastName.addEventListener('change', function (e) {
-        if (/^[A-Z][A-Za-z -ïîëéèùôö]{1,45}$/.test(e.target.value)) {
+        if (/^[A-Z][A-Za-z -ïîëéèùûêâôöçäü]{1,45}$/.test(e.target.value)) {
             document.getElementById('lastNameErrorMsg').textContent = "";
             lastName.style.border = 'solid medium green';
             document.getElementById('order').removeAttribute('disabled');
@@ -286,7 +291,7 @@ function formLastName() {
 function formAddress() {
     let address = document.getElementById('address');
     address.addEventListener('change', function (e) {
-        if (/^[a-zA-Z0-9\s,'-.ç _àçïîëéèùôöç]*$/.test(e.target.value)) {
+        if (/^[a-zA-Z0-9\s,'-.ç _àçïîëéêèûâùôöäü]*$/.test(e.target.value)) {
             document.getElementById('addressErrorMsg').textContent = "";
             address.style.border = 'solid medium green';
             document.getElementById('order').removeAttribute('disabled');
@@ -308,7 +313,7 @@ function formAddress() {
 function formCity() {
     let city = document.getElementById('city');
     city.addEventListener('change', function (e) {
-        if (/^[A-Z][A-Za-z\s'-. _]*$/.test(e.target.value)) {
+        if (/^[A-Z][A-Za-z\s'-. _àçïîëéêèûâùôöçäü]*$/.test(e.target.value)) {
             document.getElementById('cityErrorMsg').textContent = "";
             city.style.border = 'solid medium green';
             document.getElementById('order').removeAttribute('disabled');
