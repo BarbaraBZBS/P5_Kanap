@@ -5,10 +5,12 @@
 function checkLocalStorage() {
     console.log('checkLocalStorage');
     if (!localStorage.getItem('cart')) {
+        localStorage.clear();
         console.log("localStorage VIDE !");
         alert(
-            "Votre panier est vide, selectionnez un produit depuis la page d'accueil et ajoutez le à votre panier !"
+            "Votre panier est vide, vous allez être redirigé vers la page d'accueil. Sélectionnez un produit et ajoutez le à votre panier !"
         );
+        location.href = 'index.html';
         return false;
     } else {
         console.log('Storage :', JSON.parse(localStorage.getItem('cart')));
@@ -129,7 +131,7 @@ function setQtyForOneProduct() {
                 //console.log(cartProductAmount);
                 if (row.value == 0 || row.value < 0 || row.value == "" || row.value > 100) {
                     alert("Choisissez une nouvelle quantité comprise entre 1 et 100 !");
-                    return cartProductAmount
+                    location.reload(true);
                 }
                 else {
                     /**storage update**/
@@ -198,7 +200,7 @@ function removeOneProduct() {
                 for (const row of myCart) {
                     if (row.productId == cartProductId && row.color == cartProductColor) {
                         console.log("SUPPRESSION du panier : " + row.name + " " + row.color);
-                        //alert("SUPPRESSION du panier : " + row.name + " " + row.color);
+                        alert("SUPPRESSION du panier : " + row.name + " " + row.color);
                         myCart.splice(idx, 1);
                         //console.log('index', idx);
                     }
@@ -208,6 +210,11 @@ function removeOneProduct() {
                 e.target.closest('article').remove();
                 setAmountForAllProducts();
                 setPriceForAllProducts();
+                if (deleteBtn.length == 0) {
+                    localStorage.clear();
+                    alert("Vous avez supprimé le dernier article du panier, vous allez être redirigé vers la page d'accueil !");
+                    location.href= 'index.html'
+                }                      
             });
         }
         return myCart;
@@ -234,7 +241,7 @@ if (checkLocalStorage()) {
         })
         .catch((error) => {
             console.log("Erreur : requête API", error);
-            alert("Erreur !");
+            //alert("Erreur !");
         });
 }
 

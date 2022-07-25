@@ -34,7 +34,7 @@ function getProducts() {
         })
         .catch(function (err) {
             console.log('error :', err);
-            alert("Erreur")
+            //alert("Erreur")
         })
 }
 
