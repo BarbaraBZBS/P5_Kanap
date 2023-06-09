@@ -131,7 +131,7 @@ function setQtyForOneProduct() {
                 //console.log(cartProductAmount);
                 if (row.value == 0 || row.value < 0 || row.value == "" || row.value > 100) {
                     alert("Choisissez une nouvelle quantité comprise entre 1 et 100 !");
-                    location.reload(true);
+                    setHtmlContentProduct();
                 }
                 else {
                     /**storage update**/
