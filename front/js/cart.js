@@ -390,10 +390,9 @@ function sendForm(e) {
             })
             .then(function (formOrder) {
                 alert("Merci pour votre commande !");
-                //console.log('success :', formOrder);
+                console.log('success :', formOrder);
                 location.href = 'confirmation.html?id=' + formOrder.orderId;
-                //console.log('storage', JSON.parse(localStorage.getItem("cart")));
-                console.log('order#', orderId)
+                //console.log('storage', JSON.parse(localStorage.getItem("cart"));
             })
             .catch(function (err) {
                 console.log("an error occurred", err);
